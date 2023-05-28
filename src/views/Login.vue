@@ -38,11 +38,11 @@ const fullName = computed({
 
 const name = ref('Vue.js')
 
-function greet(event) {
+function greet(event : Event) {
   alert(`Hello ${name.value}!`) 
-  // `event` is the native DOM event
-  if (event) {
-    alert(event.target.tagName)
+  const target = event.target as HTMLElement;
+  if (target.tagName) {
+    alert(target.tagName);
   }
 }
 interface Person {

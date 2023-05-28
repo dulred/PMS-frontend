@@ -4,16 +4,12 @@
     </div>
 </template>
 
-<script>
-    export default{
-        name:"Test",
-        data () {
-            return{
-                msg:"66666666666"
-            }
-        }
-        
-    }
+<script lang="ts" setup >
+
+import {ref} from "vue";
+const  msg = ref (666);
+
+
 </script>
 
 <style>
