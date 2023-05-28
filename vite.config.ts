@@ -24,6 +24,15 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/personmis/, '')
       }
     }
-  }
+  },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        // '@import "assets/scss/globalVar.scss";@import "assets/scss/globalMixin.scss";'
+        additionalData: '@import "../assets/scss/globalVar.scss";@import "../assets/scss/globalMixin.scss";@import "../assets/scss/globalExtend.scss";'
+      }
+    }
+  },
+
   
 })
