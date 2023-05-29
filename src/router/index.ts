@@ -6,12 +6,15 @@ const routes = [
 
     {
         path:'/',
-        // redirect:"/login",
-        component:Test
+        redirect:"/login",
     },
     {
         path: '/login',
         component: Login,
+    },
+    {
+        path: '/test',
+        component:Test
     },
 
 ]
@@ -20,7 +23,7 @@ const routes = [
 
 const router = createRouter(
     {
-        history: createWebHistory(import.meta.env.BASE_URL), 
+    history: createWebHistory(import.meta.env.BASE_URL), 
     routes
 }
 )
