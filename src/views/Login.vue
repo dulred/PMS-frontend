@@ -5,7 +5,7 @@
       <el-input v-model="ruleForm.uname"  placeholder="请输入用户名"></el-input>
     </el-form-item>
     <el-form-item label="密码" prop="upwd">
-      <el-input v-model="ruleForm.upwd" placeholder="请输入密码"></el-input>
+      <el-input v-model="ruleForm.upwd" placeholder="请输入密码"  show-password></el-input>
     </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="submitForm(ruleFormRef)" :loading="loadingbut">{{loadingbuttext}}</el-button>
@@ -15,41 +15,85 @@
   </el-dialog>
   </template>
   <script setup lang="ts">
+import {ref,inject}  from "vue";
+import  { ElMessage, ElMessageBox} from 'element-plus'
+import type { Action ,FormInstance, FormRules} from 'element-plus'
+import { useRouter, useRoute } from 'vue-router'
+import { useStore } from 'vuex'
 
-  import {ref}  from "vue";
-  import type { FormInstance, FormRules } from 'element-plus'
 
-  const ruleFormRef = ref<FormInstance>()
-  const ruleForm  = ref({
-    uname:"",
-    upwd:""
-  });
+const store = useStore()
+const router = useRouter()
+const route = useRoute()
+const axios:any = inject("$axios");
 
-  const rules  = ref<FormRules>({
-      uname: [{required: true, message: '请输入用户名', trigger: 'blur'}],
-      upwd: [{required: true, message: '请输入密码', trigger: 'blur'}]
-  })
 
-  const handleClose = () => {
-     return dialogVisible.value =true
- }
+const ruleFormRef = ref<FormInstance>()
+const ruleForm  = ref({
+  uname:"",
+  upwd:""
+});
 
+const rules  = ref<FormRules>({
+    uname: [{required: true, message: '请输入用户名', trigger: 'blur'}],
+    upwd: [{required: true, message: '请输入密码', trigger: 'blur'}]
+})
+const handleClose = () => {
+    return dialogVisible.value =true
+}
 
 const dialogVisible = ref(true);
 const loadingbut = ref(false);
 const loadingbuttext = ref("登录");
 
+console.log(store.state.count)
+store.commit("changeCount",3)
+console.log(store.state.count)
+console.log(store.state.isLogin)
+
 
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
-  await formEl.validate((valid, fields) => {
+  await formEl.validate((valid:any, fields:any) => {
     if (valid) {
+    
       loadingbut.value = true
       loadingbuttext.value = '登录中...'
-      console.log('submit!')   
+
+      axios.post("/login",{
+        uname:ruleForm.value.uname,
+        upwd:ruleForm.value.upwd
+      })
+      .then ((successResponse:any)=>{
+          if(successResponse.data=="ok"){
+            ElMessage({
+              message: '恭喜您，您已成功登录',
+              type: 'success',
+              showClose: true,
+            })
+            store.commit('changeLogin',ruleForm.value.uname)
+            console.log(store.state.isLogin)
+            let path = route.query.redirect
+            router.replace({path: path === '/' || path === undefined ? '/department': path})
+          }else{
+            ElMessage.error('用户名或密码错误,请您重新输入')
+            loadingbut.value = false;
+            loadingbuttext.value = '登录'
+          }
+      })
+      .catch ((error:any)=>{
+        ElMessage({
+              message: '请检查网络或者服务器',
+              type: 'warning',
+              showClose: true,
+        })
+        loadingbut.value = false
+      loadingbuttext.value = '登录'
+      })
+
 
     } else {
-      console.log('error submit!', fields)
+      ElMessage.error('验证失败，请输入合法的值')
     }
   })
 }

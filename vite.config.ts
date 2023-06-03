@@ -5,10 +5,6 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  define: {
-    'process.env': {}
-  },
-  base: '/',
   plugins: [vue()],
   resolve: {
     alias: {
@@ -19,7 +15,8 @@ export default defineConfig({
     proxy: {
       // 将所有以 /personmis 开头的请求自动代理到 http://localhost:8443 下
       '/personmis': { 
-        target: 'http://localhost:8443',
+        // target: 'http://localhost:8443',
+        target: 'http://localhost:8556',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/personmis/, '')
       }
