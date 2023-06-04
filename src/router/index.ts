@@ -20,6 +20,12 @@ const routes = [
         component: ()=>import("../views/Department.vue"),
         meta: { requiresAuth: true }
       },
+      {
+        name:"AddDepartment",
+        path: '/adddepartment',
+        component: ()=>import("../views/AddDepartment.vue"),
+        meta: { requiresAuth: true }
+    },
     {
         name:"Test",
         path: '/test',
