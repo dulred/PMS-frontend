@@ -12,14 +12,14 @@
     >
 
 <el-sub-menu index="1">
-    <template #title>岗位管理</template>
-    <el-menu-item index="/department">管理岗位</el-menu-item>
-    <el-menu-item index="/adddepartment">新增岗位</el-menu-item>
+    <template #title>部门管理</template>
+    <el-menu-item index="/department">管理部门</el-menu-item>
+    <el-menu-item index="/addDepartment">新增部门</el-menu-item>
   </el-sub-menu>
   <el-sub-menu index="2">
     <template #title>岗位管理</template>
     <el-menu-item index="/post">管理岗位</el-menu-item>
-    <el-menu-item index="/addpost">新增岗位</el-menu-item>
+    <el-menu-item index="/addPost">新增岗位</el-menu-item>
   </el-sub-menu>
   <el-sub-menu index="3">
     <template #title>员工管理</template>
@@ -30,7 +30,7 @@
   <el-sub-menu index="5">
       <template #title>岗位调动管理</template>
       <el-menu-item index="/addTransferStaff">录入岗位调动</el-menu-item>
-      <el-menu-item index="/TransferStaff">查询调动员工</el-menu-item>
+      <el-menu-item index="/transferStaff">查询调动员工</el-menu-item>
   </el-sub-menu>
    <el-sub-menu index="6">
       <template #title>员工离职管理</template>

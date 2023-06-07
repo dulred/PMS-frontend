@@ -17,7 +17,7 @@
   <script setup lang="ts">
 import {ref,inject}  from "vue";
 import  { ElMessage, ElMessageBox} from 'element-plus'
-import type { Action ,FormInstance, FormRules} from 'element-plus'
+import type {FormInstance, FormRules} from 'element-plus'
 import { useRouter, useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 
@@ -46,11 +46,6 @@ const dialogVisible = ref(true);
 const loadingbut = ref(false);
 const loadingbuttext = ref("登录");
 
-console.log(store.state.count)
-store.commit("changeCount",3)
-console.log(store.state.count)
-console.log(store.state.isLogin)
-
 
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
@@ -72,7 +67,6 @@ const submitForm = async (formEl: FormInstance | undefined) => {
               showClose: true,
             })
             store.commit('changeLogin',ruleForm.value.uname)
-            console.log(store.state.isLogin)
             let path = route.query.redirect
             router.replace({path: path === '/' || path === undefined ? '/department': path})
           }else{
