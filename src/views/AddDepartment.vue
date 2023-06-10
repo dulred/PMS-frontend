@@ -1,13 +1,13 @@
 <template>
     <NavMain></NavMain>
   <div class="box">
-   <el-form ref="addForm" :model="addForm" :rules="rules"  style="width:50%;"  label-width="50%" >
+   <el-form ref="addFormRef" :model="addForm" :rules="rules"  style="width:30%;"  >
   <el-form-item label="部门名称"  prop="dname">
     <el-input v-model="addForm.dname"  placeholder="请输入部门名"></el-input>
   </el-form-item>
  <el-form-item label="部门类型" prop="dtype">
     <el-select v-model="addForm.dtype" placeholder="请选择部门类型">
-      <el-option v-for="(item,index) in dtypes" :key="index" :label="item" :value="item"></el-option>
+      <el-option v-for="(item) in dtypes"  :value="item"></el-option>
     </el-select>
   </el-form-item>
   <el-form-item label="电话"  prop="dtel">
@@ -21,7 +21,7 @@
   </el-form-item>
   <el-form-item label="上级部门" prop="supdepartment">
     <el-select v-model="addForm.supdepartment" placeholder="请选择上级部门">
-      <el-option v-for="(item,index) in supdepartments" :key="index" :label="item.dname" :value="item.id"></el-option>
+      <el-option v-for="(item) in supdepartments"  :value="item.id"></el-option>
     </el-select>
   </el-form-item>
   <el-form-item>
@@ -34,6 +34,7 @@
   </template>
   
   <script lang="ts" setup>
+    import NavMain from '@/components/NavMain.vue';
   import {ref} from "vue";
   import type {FormInstance, FormRules} from 'element-plus'
   const addForm = ref({
@@ -53,11 +54,11 @@
   const loadingbut = ref(false);
 const loadingbuttext = ref("登录");
 const rules  = ref<FormRules>({
-    uname: [{required: true, message: '请输入用户名', trigger: 'blur'}],
-    upwd: [{required: true, message: '请输入密码', trigger: 'blur'}]
+         dname: [{required: true, message: '请输入部门名称', trigger: 'blur'}],
+          dtype: [{required: true, message: '请选择部门类型', trigger: 'blur'}]
 })
 
-const add = (addForm)=>{
+const add = (addForm:any)=>{
 
 }
 const cancel = ()=>{

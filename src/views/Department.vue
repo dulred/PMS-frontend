@@ -53,7 +53,7 @@
     </el-pagination>
     <!-- 修改 -->
     <el-dialog title="部门修改" v-model="dialogVisibleDetail"  width="40%" >
-   <el-form ref="detailData" :model="detailData"  style="width:80%;"  label-width="40%" >
+   <el-form ref="detailDataRef" :model="detailData"  style="width:80%;"  label-width="40%" >
   <el-form-item label="部门名称"  prop="dname">
     <el-input v-model="detailData.dname"></el-input>
   </el-form-item>
@@ -84,7 +84,7 @@
   </el-dialog>
   <!-- 详情 -->
   <el-dialog title="部门详情" v-model="dialogVisible"  width="50%" >
- <el-form ref="detailData" :model="detailData" disabled  style="width:80%;"  label-width="40%" >
+ <el-form ref="detailDataRef" :model="detailData" disabled  style="width:80%;"  label-width="40%" >
   <el-form-item label="部门名称"  prop="dname">
     <el-input v-model="detailData.dname"></el-input>
   </el-form-item>
@@ -136,6 +136,8 @@
     supdepartment:""
   });
   const supdepartments = ref([{id:"",dname:""}]);
+  
+
   
   //部门查询
   const dtypes  = ref([ '', '核心业务部门', '支持职能部门', '管理职能部门', '战略规划部门', '专项任务部门'])
