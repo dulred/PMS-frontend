@@ -21,12 +21,12 @@
   </el-form-item>
   <el-form-item label="上级部门" prop="supdepartment">
     <el-select v-model="addForm.supdepartment" placeholder="请选择上级部门">
-      <el-option v-for="(item) in supdepartments"  :value="item.id"></el-option>
+      <el-option v-for="(item) in supdepartments"  :label="item.dname" :value="item.id"></el-option>
     </el-select>
   </el-form-item>
   <el-form-item>
-    <el-button type="primary" @click="add(addForm)" :loading="loadingbut">{{loadingbuttext}}</el-button>
-    <el-button type="danger" @click="cancel">重置</el-button>
+    <el-button type="primary" @click="add(addFormRef)" :loading="loadingbut" > {{loadingbuttext}} </el-button>
+    <el-button type="danger" @click="cancel(addFormRef)">重置</el-button>
   </el-form-item>
 </el-form>
  </div>
@@ -35,8 +35,9 @@
   
   <script lang="ts" setup>
     import NavMain from '@/components/NavMain.vue';
-  import {ref} from "vue";
+  import {ref,onMounted,inject} from "vue";
   import type {FormInstance, FormRules} from 'element-plus'
+  const axios:any = inject("$axios");
   const addForm = ref({
     dname:"",
     dtype:"",
@@ -51,21 +52,59 @@
     id:"",
     dname:""
   }])
-  const loadingbut = ref(false);
-const loadingbuttext = ref("登录");
+const addFormRef =ref<FormInstance> ()
+const loadingbut = ref(false);
+const loadingbuttext = ref("新增");
 const rules  = ref<FormRules>({
          dname: [{required: true, message: '请输入部门名称', trigger: 'blur'}],
-          dtype: [{required: true, message: '请选择部门类型', trigger: 'blur'}]
+          dtype: [{required: true, message: '请选择部门类型', trigger: 'change'}]
 })
 
-const add = (addForm:any)=>{
 
+
+onMounted(()=>{
+  loadSupdepartment()
+  test()
 }
-const cancel = ()=>{
+)
 
+const loadSupdepartment = ()=>{
+      axios
+          .get('/getDepartment')
+          .then((successResponse:any)=> {
+            // supdepartments.value = successResponse.data;
+            console.log(successResponse)
+          })
+          .catch((failResponse:any) => {
+              alert("失败了")
+          })
 }
 
-  </script>
+const test = ()=>{
+  axios.get("test").then((resp :any)=>{
+      console.log(resp);
+  }).catch ((error :any )=>{
+    alert("你失败了。")
+  })
+}
+
+const add = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  await formEl.validate((valid:any, fields:any) => {
+    if (valid) {
+      console.log('submit!')
+    } else {
+      console.log('error submit!', fields)
+    }
+  })
+}
+
+const cancel = (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  formEl.resetFields()
+}
+
+</script>
   
   <style lang="scss" scoped>
       .box  { margin-top: 30px; display: flex;justify-content: center;}
