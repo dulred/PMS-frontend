@@ -115,14 +115,15 @@
   
 <script lang="ts" setup> 
 
-  import {ref , inject} from "vue";
+  import {ref , inject,onMounted} from "vue";
   import NavMain from '@/components/NavMain.vue';
+
   const axios:any = inject("$axios")
   //部门
   const selectForm = ref({ currentPage: 1, pageSize: 1, act: '' ,dname:"",dtype:""})
   //页码变量
-  const pageSize = ref(3);
-  const total = ref(5)
+  const pageSize = ref(5);
+  let total = ref(5)
   const currentPage =ref(1)
   //弹出的对话框
   const dialogVisible = ref(false);
@@ -142,45 +143,28 @@
   //部门查询
   const dtypes  = ref([ '', '核心业务部门', '支持职能部门', '管理职能部门', '战略规划部门', '专项任务部门'])
   //表格
-  const tableData = ref([
-    {
-      id:"1",
-      dname:"nishizhu",
-      dtype:"工厂",
-      establishmentdate1:"20230413"
-    },
-    {
-      id:"2",
-      dname:"nishizhu",
-      dtype:"工厂",
-      establishmentdate1:"20230413"
-    },
-    {
-      id:"3",
-      dname:"nishizhu",
-      dtype:"工厂",
-      establishmentdate1:"20230413"
-    },
-    {
-      id:"4",
-      dname:"nishizhu",
-      dtype:"工厂",
-      establishmentdate1:"20230413"
-    },
-    {
-      id:"5",
-      dname:"nishizhu",
-      dtype:"工厂",
-      establishmentdate1:"20230413"
-    },
-    {
-      id:"6",
-      dname:"nishizhu",
-      dtype:"工厂",
-      establishmentdate1:"20230413"
-    },
+  let tableData = ref([
+   {}
   ])
 
+    onMounted(()=>{
+      loadDepartment()
+    })
+
+  const loadDepartment = ()=>{
+      axios.post("/getDepartmentByPage",{
+        currentPage:currentPage.value,
+        pageSize:pageSize.value
+      })
+      .then((resp:any)=>{
+        tableData.value = resp.data.departs;
+        total.value = resp.data.total;
+ 
+      })
+      .catch((error:any)=>{
+        alert("请求失败")
+      })
+  }
 
   // 页码
   const handleCurrentChange = ()=>{
@@ -229,6 +213,7 @@
       display: flex;justify-content: center;
       .el-form {margin: auto;}
       }
-      .pagination {margin-top: 20px;}
+      .pagination {margin-top: 20px;display: flex;
+    justify-content: center; align-items: center;}
 
 </style>

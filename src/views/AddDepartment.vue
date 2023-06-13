@@ -37,7 +37,10 @@
     import NavMain from '@/components/NavMain.vue';
   import {ref,onMounted,inject} from "vue";
   import type {FormInstance, FormRules} from 'element-plus'
+  import  { ElMessage} from 'element-plus'
+  import { useRouter } from 'vue-router'
   const axios:any = inject("$axios");
+  const router = useRouter();
   const addForm = ref({
     dname:"",
     dtype:"",
@@ -72,8 +75,7 @@ const loadSupdepartment = ()=>{
       axios
           .get('/getDepartment')
           .then((successResponse:any)=> {
-            // supdepartments.value = successResponse.data;
-            console.log(successResponse)
+            supdepartments.value = successResponse.data;
           })
           .catch((failResponse:any) => {
               alert("失败了")
@@ -92,7 +94,31 @@ const add = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid:any, fields:any) => {
     if (valid) {
-      console.log('submit!')
+            loadingbut.value = true;
+            loadingbuttext.value = '添加中...';
+            axios.post ("/addDepartment",addForm.value)
+            .then ((resp : any)=>{
+
+              if(resp.data=="ok"){
+                ElMessage({
+                  message: '恭喜您，您已经成功插入',
+                  type: 'success',
+                  showClose: true,
+                })
+                router.replace({path:  '/department'})
+              }else{
+                ElMessage.error('插入失败了')
+                loadingbut.value = false;
+                loadingbuttext.value = '新增'
+              }
+              console.log(addForm.value)
+              console.log(resp)
+            })
+            .catch((error:any )=>{
+              ElMessage.error('用户名或密码错误,请您重新输入')
+              loadingbut.value = false;
+              loadingbuttext.value = '新增'
+            })
     } else {
       console.log('error submit!', fields)
     }
