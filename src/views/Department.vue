@@ -43,7 +43,7 @@
       </el-table>
     </div>
     <!-- 页码 -->
-    <div class="pagination">
+  <div class="pagination">
     <el-pagination
       @current-change="handleCurrentChange"
       v-model:currentPage="currentPage"
@@ -51,6 +51,7 @@
       layout="total, prev, pager, next"
       :total="total" background>
     </el-pagination>
+  </div>
     <!-- 修改 -->
     <el-dialog title="部门修改" v-model="dialogVisibleDetail"  width="40%" >
    <el-form ref="detailDataRef" :model="detailData"  style="width:80%;"  label-width="40%" >
@@ -77,8 +78,8 @@
     </el-select>
   </el-form-item>
   <el-form-item>
-    <el-button type="primary" @click="update(detailData)">修改</el-button>
-    <el-button type="danger" @click="cancel">重置</el-button>
+    <el-button type="primary" @click="update(detailDataRef)">修改</el-button>
+    <el-button type="danger" @click="cancel(detailDataRef)">重置</el-button>
   </el-form-item>
 </el-form>
   </el-dialog>
@@ -110,21 +111,23 @@
   </el-form>
   </el-dialog>
 
-  </div>
+
 </template>
   
 <script lang="ts" setup> 
 
   import {ref , inject,onMounted} from "vue";
   import NavMain from '@/components/NavMain.vue';
-
+  import { ElMessage, ElMessageBox } from 'element-plus'
+  import type {FormInstance, FormRules} from 'element-plus'
   const axios:any = inject("$axios")
-  //部门
-  const selectForm = ref({ currentPage: 1, pageSize: 1, act: '' ,dname:"",dtype:""})
+  const detailDataRef =ref<FormInstance> ()
   //页码变量
   const pageSize = ref(5);
   let total = ref(5)
   const currentPage =ref(1)
+   //部门
+   const selectForm = ref({ currentPage: currentPage.value, pageSize: pageSize.value, act: '' ,dname:"",dtype:""})
   //弹出的对话框
   const dialogVisible = ref(false);
   const dialogVisibleDetail = ref(false);
@@ -167,13 +170,30 @@
   }
 
   // 页码
-  const handleCurrentChange = ()=>{
-    console.log("nishizhu")
+  const handleCurrentChange = (val:any)=>{
+    currentPage.value=val;
+    if(selectForm.value.act=="byCon"){
+      selectForm.value.currentPage = currentPage.value;
+      selectForm.value.pageSize = pageSize.value
+      selectDepartmentsByCon()
+    }else{
+      loadDepartment()
+    }
+
   }
 
   //部门查询
   const selectDepartmentsByCon = ()=>{
-    console.log("nishizhu")
+    selectForm.value.act="byCon"
+      axios.post("/selectDepartmentsByCon",selectForm.value)
+      .then((resp:any)=>{
+        tableData.value = resp.data.departs;
+        total.value = resp.data.total;
+        console.log(resp)
+      })
+      .catch((error:any)=>{
+        alert("请求失败")
+      })
   }
   //头部样式
   const headClass=()=> { 
@@ -181,24 +201,86 @@
   };
   //表格编辑
   const handleEdit = (index:any,row:any,act:any)=>{
+    axios.post("/getDepartmentDetail?id=" + row.id)
+    .then((resp:any)=>{
+      detailData.value = resp.data.adepart
+      supdepartments.value =resp.data.departs
+    })
+    .catch((error:any)=>{
+      console.log(error)
+    })
     if(act === 'update')
         dialogVisibleDetail.value = true
       else
         dialogVisible.value = true
+
   }
   //表格删除
   const handleDelete = (index:any,row:any)=>{
-    console.log("nishizhu")
+    ElMessageBox.confirm(
+    'proxy will permanently delete the file. Continue?',
+    'Warning',
+    {
+      confirmButtonText: 'OK',
+      cancelButtonText: 'Cancel',
+      type: 'warning',
+    }
+  )
+    .then(() => {
+      axios.post("/deleteDepartment?id=" + row.id)
+      .then(
+        (resp :any)=>{
+          if(resp.data=="ok"){
+            ElMessage({
+            type: 'success',
+            message: 'Delete completed',
+          })
+          loadDepartment();
+          }else{
+            ElMessage.error('不能删除有关联数据')
+          }
+  
+        }
+      )
+      .catch((failResponse :any) => {
+          ElMessage.error('删除失败,可能传入数据有误')
+        })
+     
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: 'Delete canceled',
+      })
+    })
   }
 
   //更新
-  const update = (detailData : any)=>{
-      console.log("nishizhu")
+  const update = (detailDataRef : any)=>{
+    console.log(detailData.value)
+      axios.post("/updateDepartment",detailData.value)
+      .then(
+        (resp:any)=>{
+          if(resp.data="ok"){
+            ElMessage({
+            type: 'success',
+            message: 'Update completed',
+          })
+              dialogVisibleDetail.value=false;
+              loadDepartment();
+          }else{
+            ElMessage.error("修改失败")
+            dialogVisibleDetail.value=false;
+          }
+        }
+      )
+      .catch ((error:any) => console.log("失败"))
   }
-  //删除
-  const cancel = ()=>{
-    console.log("nishizhu")
-  }
+  //重置
+  const cancel = (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  formEl.resetFields()
+}
 
   
 

@@ -7,7 +7,7 @@ import installElementPlus from "./plugins/element"
 
 // 创建vue实例 以及阻止显示生产模式的消息
 const vapp = createApp(App,{
-  devtools: false,
+  devtools: true,
 })
 //设置反向代理，前端请求默认发送到 http://localhost:8443/personmis
 //使用axios 来完成 ajax请求

@@ -67,7 +67,6 @@ const rules  = ref<FormRules>({
 
 onMounted(()=>{
   loadSupdepartment()
-  test()
 }
 )
 
@@ -82,13 +81,6 @@ const loadSupdepartment = ()=>{
           })
 }
 
-const test = ()=>{
-  axios.get("test").then((resp :any)=>{
-      console.log(resp);
-  }).catch ((error :any )=>{
-    alert("你失败了。")
-  })
-}
 
 const add = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
@@ -111,8 +103,6 @@ const add = async (formEl: FormInstance | undefined) => {
                 loadingbut.value = false;
                 loadingbuttext.value = '新增'
               }
-              console.log(addForm.value)
-              console.log(resp)
             })
             .catch((error:any )=>{
               ElMessage.error('用户名或密码错误,请您重新输入')
