@@ -418,8 +418,12 @@
   
   <script lang="ts" setup>
   import NavMain from '@/components/NavMain.vue';
-  import {ref} from "vue";
+  import {ref,onMounted,inject} from "vue";
   import type {FormInstance,FormRules} from "element-plus"
+  import {ElMessage} from "element-plus"
+
+  const axios:any = inject("$axios");
+
   const loadingbut = ref(false);
   const loadingbuttext = "修改"
   const selectFormRef =ref<FormInstance> ()
@@ -429,7 +433,7 @@
   const dialogVisible = ref(false)
 
   //页码变量
-  const pageSize = ref(3);
+  const pageSize = ref(5);
   const total = ref(5)
   const currentPage =ref(1)
 
@@ -450,28 +454,8 @@
       staffsource: [{ required: true, message: '请选择人员来源', trigger: 'change' }],
     })
 
-    const departments = ref([
-      { id:"1",dname:"战略规划部门" },
-      { id:"2",dname:"行政部门" },
-      { id:"3",dname:"技术部门" },
-      { id:"4",dname:"产品部门" },
-      { id:"5",dname:"市场部门" },
-      { id:"6",dname:"财务部门" },
-      { id:"7",dname:"商务部门" },
-      { id:"8",dname:"审计部门" },
-      { id:"9",dname:"研究院/实验室" },
-      { id:"10",dname:"法务部门" },
-      { id:"11",dname:"项目组" },
-    ])
-
-    const posts =  ref([
-      { id:"1",pname:"系统架构师" },
-      { id:"2",pname:"全栈工程师" },
-      { id:"3",pname:"后端工程师" },
-      { id:"4",pname:"前端工程师" },
-      { id:"5",pname:"测试工程师" },
-      { id:"6",pname:"运维工程师" },
-    ])
+    const departments = ref([])
+    const posts =  ref([])
 
 const  staffsources = ref([ '校园招聘','社会招聘','军转','其它']);
 const  politicalstatuss = ref(['党员', '预备党员', '团员']);
@@ -483,14 +467,72 @@ const  bloodtypes = ref(["A 型","B 型","AB 型","0 型","其他血型","未定
 const  educations = ref(["高中及以下","大专","本科","研究生"]);
 const  degrees = ref(["无学位","学士","双学士","硕士","博士"]);
 
+onMounted(()=>{
+    loadStaff();
+    loadDepartment();
+    loadPost();
+})
+
+const loadStaff = ()=>{ 
+    axios.post("/getStaff",{
+        currentPage:currentPage.value,
+        pageSize : pageSize.value
+    })
+    .then((resp:any)=>{
+        tableData.value = resp.data.staffs;
+        total.value  = resp.data.total;
+    })
+    .catch((error:any)=>{
+        console.log("首次加载数据失败")
+    })
+}
+
+const loadDepartment = ()=>{ 
+    axios.get("/getDepartment")
+    .then((resp:any)=>{
+        departments.value = resp.data;
+    })
+    .catch((error:any)=>{
+        console.log("首次加载Department数据失败")
+    })
+}
+
+const loadPost = ()=>{ 
+    axios.get("/getPost")
+    .then((resp:any)=>{
+        posts.value = resp.data;
+    })
+    .catch((error:any)=>{
+        console.log("首次加载Post数据失败")
+    })
+}
 
 const add = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid:any, fields:any) => {
     if (valid) {
-      console.log('submit!')
+
+        axios.post("/updateStaff",addForm.value)
+        .then((resp)=>{
+            console.log(resp.data)
+            if(resp.data=="ok"){
+                ElMessage({
+                    message:"你已修改成功",
+                    type:"success"
+                })
+                dialogVisibleDetail.value = false
+                loadStaff();
+            }else{
+                ElMessage.error("修改失败，请检查数据")
+                dialogVisibleDetail.value = false
+            }
+        })
+        .catch((error)=>{
+            ElMessage.error("请求修改失败，请检查网络")
+        })
+
     } else {
-      console.log('error submit!', fields)
+        ElMessage.error("验证失败，请检查是否数据格式和要求")
     }
   })
 }
@@ -502,17 +544,47 @@ const cancel = (formEl: FormInstance | undefined) => {
 
 
   // 页码
-  const handleCurrentChange = ()=>{
-    console.log("nishizhu")
+  const handleCurrentChange = (val)=>{
+    currentPage.value = val
+    if(selectForm.value.act=="byCon"){
+        selectForm.value.currentPage = currentPage.value;
+        selectForm.value.pageSize = pageSize.value;
+        selectStaffsByCon()
+    }else{
+        loadStaff();
+    }
   }
 
   //头部样式
   const headClass=()=> { 
     return { textAlign: 'center',backgroundColor:"rgb(242,242,242)",color:"rgb(140,138,140)", }
   };
-  const selectStaffsByCon = ()=>{ }
+  const selectStaffsByCon = ()=>{
+        selectForm.value.act="byCon";
+   
+        axios.post("/selectStaffByCon",selectForm.value)
+        .then((resp)=>{
+            console.log(resp)
+            tableData.value = resp.data.staffs;
+            total.value = resp.data.total;
+            ElMessage({
+                message:"查询成功",
+                type:"success"
+            })
+        })
+        .catch((error)=>{
+            ElMessage.error("查询失败")
+        })
+   }
   //表格编辑
   const handleEdit = (index:any,row:any,act:any)=>{
+    axios.get("/getStaffDetail?id=" + row.id)
+    .then((resp)=>{
+        addForm.value = resp.data;
+    })
+    .catch((error)=>{
+        ElMessage.error("查询数据失败")
+    })
     if(act === 'update')
         dialogVisibleDetail.value = true
       else
@@ -525,12 +597,15 @@ const cancel = (formEl: FormInstance | undefined) => {
 
   </script>
 
+
 <style lang="scss" scoped>
 .Dep01  {
   margin-top: 30px;
   display: flex;justify-content: center;
   .el-form {margin: auto;}
   }
-  .pagination {margin-top: 20px;}
+
+  .pagination {margin-top: 20px;display: flex;
+    justify-content: center; align-items: center;}
 
 </style>

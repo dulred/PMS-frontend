@@ -183,6 +183,7 @@ const status = ref(["正常","转正","延期","不录用"]);
   display: flex;justify-content: center;
   .el-form {margin: auto;}
   }
-  .pagination {margin-top: 20px;}
+  .pagination {margin-top: 20px;display: flex;
+    justify-content: center; align-items: center;}
 
 </style>

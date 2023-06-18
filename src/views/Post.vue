@@ -67,8 +67,8 @@
       <el-input v-model="detailData.organization" ></el-input>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="update(detailData)" :loading="loadingbut" >{{loadingbuttext}}</el-button>
-      <el-button type="danger" @click="cancel">重置</el-button>
+      <el-button type="primary" @click="update(detailDataRef)" :loading="loadingbut" >{{loadingbuttext}}</el-button>
+      <el-button type="danger" @click="cancel(detailDataRef)">重置</el-button>
     </el-form-item>
     </el-form>
     </el-dialog>
@@ -95,15 +95,18 @@
 
 <script lang="ts" setup> 
 
-import {ref , inject} from "vue";
+import {ref , inject, onMounted} from "vue";
 import NavMain from '@/components/NavMain.vue';
+import type {FormInstance, FormRules} from 'element-plus'
+import {ElMessage,ElMessageBox} from "element-plus";
 const axios:any = inject("$axios")
-//部门
-const selectForm = ref({ currentPage: 1, pageSize: 1, act: '' ,pname:"",ptype:""})
+
 //页码变量
-const pageSize = ref(3);
+const pageSize = ref(5);
 const total = ref(5);
 const currentPage =ref(1);
+//部门
+const selectForm = ref({ currentPage: 1, pageSize: pageSize.value, act: '' ,pname:"",ptype:""})
 //弹出的对话框
 const dialogVisibleDetail = ref(false);
 const dialogVisible = ref(false);
@@ -116,58 +119,62 @@ const detailData = ref ({
 // loading的变量 
 const loadingbut = ref(false);
 const loadingbuttext = ref("修改")
-
+const selectFormRef =ref<FormInstance> ()
+const detailDataRef = ref<FormInstance>()
 //部门查询
-const ptypes  = ref([ '', '核心业务部门', '支持职能部门', '管理职能部门', '战略规划部门', '专项任务部门'])
+const ptypes = ref([ '', '管理岗', '行政岗', '技术岗', '产品岗', '市场岗','财务岗','商务岗','审计岗','研发岗','法务岗','项目岗'])
 //表格
-const tableData = ref([
-  {
-    id:"1",
-    pname:"nishizhu",
-    ptype:"工厂",
-    organization:"3"
-  },
-  {
-    id:"2",
-    pname:"cc",
-    ptype:"工厂",
-    organization:"3"
-  },
-  {
-    id:"3",
-    pname:"cc1",
-    ptype:"工厂",
-    organization:"3"
-  },
-  {
-    id:"4",
-    pname:"cc2",
-    ptype:"工厂",
-    organization:"3"
-  },
-  {
-    id:"5",
-    pname:"cc1",
-    ptype:"工厂",
-    organization:"3"
-  },
-  {
-    id:"6",
-    pname:"cc2",
-    ptype:"工厂",
-    organization:"3"
-  },
-])
+const tableData = ref([])
 
+// 页面挂载后自动加载数据
+onMounted(()=>{
+    loadPosts();
+})
 
-// 页码
-const handleCurrentChange = ()=>{
-  console.log("nishizhu")
+const loadPosts = ()=>{
+  axios.post("/getPostByPage",{
+    currentPage:currentPage.value,
+    pageSize:pageSize.value
+  })
+  .then((resp :any)=>{
+      tableData.value = resp.data.posts;
+      total.value = resp.data.total;
+  })
+  .catch((error :any)=>{
+    ElMessage.error("请求首次数据失败")
+  }
+  )
+}
+
+// 页码变换
+const handleCurrentChange = (val:any)=>{
+  currentPage.value = val;
+  if(selectForm.value.act=="byCon"){
+      selectForm.value.currentPage = currentPage.value;
+      selectForm.value.pageSize = pageSize.value;
+      selectPostsByCon();
+  }else{
+    loadPosts();
+  }
+ 
 }
 
 //部门查询
 const selectPostsByCon = ()=>{
-  console.log("nishizhu")
+    selectForm.value.act="byCon"
+    axios.post("/getPostByCon",selectForm.value)
+    .then((resp:any)=>{
+        tableData.value = resp.data.posts,
+        total.value = resp.data.total
+        ElMessage({
+          message:"查询成功",
+          type:"success",
+          showClose:true
+        })
+    })
+    .catch((error:any)=>{
+        ElMessage.error("查询失败")
+    })
 }
 //头部样式
 const headClass=()=> { 
@@ -175,6 +182,13 @@ const headClass=()=> {
 };
 //表格编辑
 const handleEdit = (index:any,row:any,act:any)=>{
+  axios.post("/getPostDetail?id=" + row.id)
+  .then((resp:any)=>{
+      detailData.value = resp.data;
+  })
+  .catch((error:any)=>{
+    ElMessage.error("请求数据失败")
+  })
   if(act === 'update')
       dialogVisibleDetail.value = true
     else
@@ -182,17 +196,78 @@ const handleEdit = (index:any,row:any,act:any)=>{
 }
 //表格删除
 const handleDelete = (index:any,row:any)=>{
-  console.log("nishizhu")
+
+  ElMessageBox.confirm(
+    'proxy will permanently delete the file. Continue?',
+    'Warning',
+    {
+      confirmButtonText: 'OK',
+      cancelButtonText: 'Cancel',
+      type: 'warning',
+    }
+  )
+    .then(() => {
+      axios.post("/deletePost?id=" + row.id)
+      .then(
+        (resp :any)=>{
+          if(resp.data=="ok"){
+            ElMessage({
+            type: 'success',
+            message: 'Delete completed',
+          })
+          loadPosts();
+          }else{
+            ElMessage.error('不能删除有关联数据')
+          }
+  
+        }
+      )
+      .catch((failResponse :any) => {
+          ElMessage.error('删除失败,可能传入数据有误')
+        })
+     
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: 'Delete canceled',
+      })
+    })
+
+
+
 }
 
 //更新
-const update = (detailData : any)=>{
-    console.log("nishizhu")
+const update = (detailDataRef : any)=>{
+    loadingbut.value = true;
+    loadingbuttext.value ="修改中..."
+    axios.post("/updatePost",detailData.value)
+    .then((resp:any)=>{
+        if(resp.data=="ok"){
+            ElMessage({
+              message:"修改成功",
+              type:"success",
+            })
+            dialogVisibleDetail.value=false;
+            loadPosts();
+        }else{
+          ElMessage.error("修改失败");
+          dialogVisibleDetail.value=false;
+        }
+        loadingbut.value = false;
+        loadingbuttext.value ="修改"
+    })
+    .catch((error:any)=>{
+      ElMessage.error("请求失败");
+    })
 }
-//删除
-const cancel = ()=>{
-  console.log("nishizhu")
+//重置
+const cancel = (formEl:FormInstance | undefined)=>{
+  if(!formEl) return
+  formEl.resetFields();
 }
+
 
 
 
@@ -207,6 +282,7 @@ const cancel = ()=>{
     display: flex;justify-content: center;
     .el-form {margin: auto;}
     }
-    .pagination {margin-top: 20px;}
+    .pagination {margin-top: 20px;display: flex;
+    justify-content: center; align-items: center;}
 
 </style>

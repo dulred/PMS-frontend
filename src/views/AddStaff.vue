@@ -5,7 +5,7 @@
       </el-header>
       <el-main>
           <el-form ref="addFormRef" :model="addForm" :rules="rules" label-width="30%">
-              <el-row>
+            <el-row>
                  <el-col :span="8">
                     <el-form-item label="姓名" prop="sname">
                         <el-input v-model="addForm.sname" placeholder="请输入姓名"></el-input>
@@ -22,8 +22,8 @@
                         <el-date-picker v-model="addForm.birthday" placeholder="请选择出生日期"></el-date-picker>
                     </el-form-item>
                  </el-col>
-              </el-row>
-              <el-row>
+            </el-row>
+            <el-row>
                  <el-col :span="8">
                     <el-form-item label="身份证号" prop="sid">
                         <el-input v-model="addForm.sid" placeholder="请输入身份证号"></el-input>
@@ -43,8 +43,8 @@
                         </el-select>
                     </el-form-item>
                  </el-col>
-              </el-row>
-              <el-row>
+            </el-row>
+            <el-row>
             <el-col :span="8">
                 <el-form-item label="入职日期"  prop="entrydate">
                     <el-date-picker v-model="addForm.entrydate" type="date" placeholder="选择入职日期" style="width:100%"></el-date-picker>
@@ -61,134 +61,138 @@
                     <el-radio v-model="addForm.workform" label="临时"></el-radio>
                 </el-form-item>  
             </el-col>
-        </el-row>
-        <el-row>
+            </el-row>
+            <el-row>
+                <el-col :span="8">
+                    <el-form-item label="人员来源" prop="staffsource">
+                        <el-select v-model="addForm.staffsource" placeholder="请选择人员来源">
+                            <el-option v-for="(item,index) in staffsources" :key="index" :label="item" :value="item"></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                    <el-form-item label="政治面貌" prop="politicalstatus">
+                        <el-select v-model="addForm.politicalstatus" placeholder="请选择政治面貌">
+                            <el-option v-for="(item,index) in politicalstatuss" :key="index" :label="item" :value="item"></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                    <el-form-item label="民族" prop="nation">
+                        <el-select v-model="addForm.nation" placeholder="请选择民族">
+                            <el-option v-for="(item,index) in nations" :key="index" :label="item" :value="item"></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="8">
+                    <el-form-item label="籍贯" prop="nativeplace">
+                        <el-input v-model="addForm.nativeplace"  placeholder="请输入籍贯"></el-input>
+                    </el-form-item>
+                </el-col>  
+                <el-col :span="8">
+                    <el-form-item label="联系电话" prop="stel">
+                        <el-input v-model="addForm.stel"  placeholder="请输入联系电话"></el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                    <el-form-item label="电子邮件" prop="semail">
+                        <el-input v-model="addForm.semail"  placeholder="请输入电子邮件"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="8">
+                    <el-form-item label="身高" prop="sheight">
+                        <el-input v-model="addForm.sheight"  placeholder="请输入身高"></el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                    <el-form-item label="血型" prop="bloodtype">
+                        <el-select v-model="addForm.bloodtype" placeholder="请选择血型">
+                            <el-option v-for="(item,index) in bloodtypes" :key="index" :label="item" :value="item"></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>  
+                <el-col :span="8">
+                    <el-form-item label="婚姻状况" prop="maritalstatus">
+                        <el-radio v-model="addForm.maritalstatus" label="已婚">已婚</el-radio>
+                        <el-radio v-model="addForm.maritalstatus" label="未婚">未婚</el-radio>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row> 
+                <el-col :span="8">
+                    <el-form-item label="户口所在地" prop="registeredresidence">
+                        <el-input v-model="addForm.registeredresidence"  placeholder="请输入户口所在地"></el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                    <el-form-item label="最高学历" prop="education" >
+                        <el-select v-model="addForm.education" placeholder="请选择最高学历">
+                            <el-option v-for="(item,index) in educations" :key="index" :label="item" :value="item"></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                    <el-form-item label="最高学位" prop="degree">
+                        <el-select v-model="addForm.degree" placeholder="请选择最高学位">
+                            <el-option v-for="(item,index) in degrees" :key="index" :label="item" :value="item"></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="8">
+                    <el-form-item label="毕业院校" prop="university">
+                        <el-input v-model="addForm.university"  placeholder="请输入毕业院校"></el-input>
+                    </el-form-item>
+                </el-col> 
+                <el-col :span="8">
+                    <el-form-item label="所学专业" prop="major">
+                        <el-input v-model="addForm.major"  placeholder="请输入所学专业"></el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                    <el-form-item label="毕业日期"  prop="graduationdate">
+                        <el-date-picker v-model="addForm.graduationdate" type="date" placeholder="选择毕业日期" style="width:100%"></el-date-picker>
+                    </el-form-item>  
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="8">
+                    <el-form-item label="试用期开始日期"  prop="startdate">
+                        <el-date-picker v-model="addForm.startdate" type="date" placeholder="选择试用期开始日期" style="width:100%"></el-date-picker>
+                    </el-form-item>  
+                </el-col>
+                <el-col :span="8">
+                    <el-form-item label="试用期结束日期"  prop="enddate">
+                        <el-date-picker v-model="addForm.enddate" type="date" placeholder="选择参加试用期结束日期" style="width:100%"></el-date-picker>
+                    </el-form-item>  
+                </el-col>
             <el-col :span="8">
-                <el-form-item label="人员来源" prop="staffsource">
-                    <el-select v-model="addForm.staffsource" placeholder="请选择人员来源">
-                        <el-option v-for="(item,index) in staffsources" :key="index" :label="item" :value="item"></el-option>
-                    </el-select>
-                </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" @click="add(addFormRef)" :loading="loadingbut">{{loadingbuttext}}</el-button>
+                        <el-button type="danger" @click="cancel(addFormRef)">重置</el-button>
+                    </el-form-item>
             </el-col>
-            <el-col :span="8">
-                <el-form-item label="政治面貌" prop="politicalstatus">
-                    <el-select v-model="addForm.politicalstatus" placeholder="请选择政治面貌">
-                        <el-option v-for="(item,index) in politicalstatuss" :key="index" :label="item" :value="item"></el-option>
-                    </el-select>
-                </el-form-item>
-            </el-col>
-            <el-col :span="8">
-                <el-form-item label="民族" prop="nation">
-                    <el-select v-model="addForm.nation" placeholder="请选择民族">
-                        <el-option v-for="(item,index) in nations" :key="index" :label="item" :value="item"></el-option>
-                    </el-select>
-                </el-form-item>
-            </el-col>
-        </el-row>
-        <el-row>
-            <el-col :span="8">
-                <el-form-item label="籍贯" prop="nativeplace">
-                    <el-input v-model="addForm.nativeplace"  placeholder="请输入籍贯"></el-input>
-                </el-form-item>
-            </el-col>  
-            <el-col :span="8">
-                <el-form-item label="联系电话" prop="stel">
-                    <el-input v-model="addForm.stel"  placeholder="请输入联系电话"></el-input>
-                </el-form-item>
-            </el-col>
-            <el-col :span="8">
-                <el-form-item label="电子邮件" prop="semail">
-                    <el-input v-model="addForm.semail"  placeholder="请输入电子邮件"></el-input>
-                </el-form-item>
-            </el-col>
-        </el-row>
-        <el-row>
-            <el-col :span="8">
-                <el-form-item label="身高" prop="sheight">
-                    <el-input v-model="addForm.sheight"  placeholder="请输入身高"></el-input>
-                </el-form-item>
-            </el-col>
-            <el-col :span="8">
-                <el-form-item label="血型" prop="bloodtype">
-                    <el-select v-model="addForm.bloodtype" placeholder="请选择血型">
-                        <el-option v-for="(item,index) in bloodtypes" :key="index" :label="item" :value="item"></el-option>
-                    </el-select>
-                </el-form-item>
-            </el-col>  
-            <el-col :span="8">
-                <el-form-item label="婚姻状况" prop="maritalstatus">
-                    <el-radio v-model="addForm.maritalstatus" label="已婚">已婚</el-radio>
-                    <el-radio v-model="addForm.maritalstatus" label="未婚">未婚</el-radio>
-                </el-form-item>
-            </el-col>
-        </el-row>
-        <el-row> 
-            <el-col :span="8">
-                <el-form-item label="户口所在地" prop="registeredresidence">
-                    <el-input v-model="addForm.registeredresidence"  placeholder="请输入户口所在地"></el-input>
-                </el-form-item>
-            </el-col>
-            <el-col :span="8">
-                <el-form-item label="最高学历" prop="education" >
-                    <el-select v-model="addForm.education" placeholder="请选择最高学历">
-                        <el-option v-for="(item,index) in educations" :key="index" :label="item" :value="item"></el-option>
-                    </el-select>
-                </el-form-item>
-            </el-col>
-            <el-col :span="8">
-                <el-form-item label="最高学位" prop="degree">
-                    <el-select v-model="addForm.degree" placeholder="请选择最高学位">
-                        <el-option v-for="(item,index) in degrees" :key="index" :label="item" :value="item"></el-option>
-                    </el-select>
-                </el-form-item>
-            </el-col>
-        </el-row>
-        <el-row>
-            <el-col :span="8">
-                <el-form-item label="毕业院校" prop="university">
-                    <el-input v-model="addForm.university"  placeholder="请输入毕业院校"></el-input>
-                </el-form-item>
-            </el-col> 
-            <el-col :span="8">
-                <el-form-item label="所学专业" prop="major">
-                    <el-input v-model="addForm.major"  placeholder="请输入所学专业"></el-input>
-                </el-form-item>
-            </el-col>
-            <el-col :span="8">
-                <el-form-item label="毕业日期"  prop="graduationdate">
-                    <el-date-picker v-model="addForm.graduationdate" type="date" placeholder="选择毕业日期" style="width:100%"></el-date-picker>
-                </el-form-item>  
-            </el-col>
-        </el-row>
-        <el-row>
-            <el-col :span="8">
-                <el-form-item label="试用期开始日期"  prop="startdate">
-                    <el-date-picker v-model="addForm.startdate" type="date" placeholder="选择试用期开始日期" style="width:100%"></el-date-picker>
-                </el-form-item>  
-            </el-col>
-            <el-col :span="8">
-                <el-form-item label="试用期结束日期"  prop="enddate">
-                    <el-date-picker v-model="addForm.enddate" type="date" placeholder="选择参加试用期结束日期" style="width:100%"></el-date-picker>
-                </el-form-item>  
-            </el-col>
-        <el-col :span="8">
-                <el-form-item>
-                    <el-button type="primary" @click="add(addFormRef)" :loading="loadingbut">{{loadingbuttext}}</el-button>
-                    <el-button type="danger" @click="cancel(addFormRef)">重置</el-button>
-                </el-form-item>
-        </el-col>
-        </el-row>
+            </el-row>
           </el-form>
       </el-main>
     </el-container>
   </template>
   
   <script lang="ts" setup>
-    import {ref} from "vue";
+    import {ref,onMounted,inject} from "vue";
     import NavMain from '@/components/NavMain.vue';
     import type {FormInstance,FormRules} from "element-plus"
+    import { useRouter } from "vue-router";
+    import { ElMessage } from "element-plus";
+    const axios:any = inject("$axios")
+    const router  = useRouter();
     const loadingbut = ref(false);
-    const loadingbuttext = "提交"
+    const loadingbuttext = ref("提交") 
     const addFormRef =ref<FormInstance> ()
     const addForm = ref({ })
 
@@ -205,28 +209,8 @@
       staffsource: [{ required: true, message: '请选择人员来源', trigger: 'change' }]
     })
 
-    const departments = ref([
-      { id:"1",dname:"战略规划部门" },
-      { id:"2",dname:"行政部门" },
-      { id:"3",dname:"技术部门" },
-      { id:"4",dname:"产品部门" },
-      { id:"5",dname:"市场部门" },
-      { id:"6",dname:"财务部门" },
-      { id:"7",dname:"商务部门" },
-      { id:"8",dname:"审计部门" },
-      { id:"9",dname:"研究院/实验室" },
-      { id:"10",dname:"法务部门" },
-      { id:"11",dname:"项目组" },
-    ])
-
-    const posts =  ref([
-      { id:"1",pname:"系统架构师" },
-      { id:"2",pname:"全栈工程师" },
-      { id:"3",pname:"后端工程师" },
-      { id:"4",pname:"前端工程师" },
-      { id:"5",pname:"测试工程师" },
-      { id:"6",pname:"运维工程师" },
-    ])
+    const departments = ref([ ])
+    const posts =  ref([ ])
 
 const  staffsources = ref([ '校园招聘','社会招聘','军转','其它']);
 const  politicalstatuss = ref(['党员', '预备党员', '团员']);
@@ -238,14 +222,57 @@ const  bloodtypes = ref(["A 型","B 型","AB 型","0 型","其他血型","未定
 const  educations = ref(["高中及以下","大专","本科","研究生"]);
 const  degrees = ref(["无学位","学士","双学士","硕士","博士"]);
 
+onMounted (()=>{
+    loadDepartment();
+    loadPost();
+})
+
+const loadDepartment = ()=>{ 
+    axios.get("/getDepartment")
+    .then((resp:any)=>{
+        departments.value = resp.data;
+    })
+    .catch((error:any)=>{
+        console.log("首次加载Department数据失败")
+    })
+}
+
+const loadPost = ()=>{ 
+    axios.get("/getPost")
+    .then((resp:any)=>{
+        posts.value = resp.data;
+    })
+    .catch((error:any)=>{
+        console.log("首次加载Post数据失败")
+    })
+}
+
 
 const add = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid:any, fields:any) => {
     if (valid) {
-      console.log('submit!')
+      loadingbut.value = true; 
+      loadingbuttext.value = '添加中...';
+      axios.post("/addStaff",addForm.value)
+      .then ((resp :any)=>{
+            if(resp.data=="ok"){
+                ElMessage({
+                    message:"您成功插入数据",
+                    type:"success",
+                })
+                router.replace({path:"/staff"})
+            }else{
+                ElMessage.eror("插入的数据在服务器中验证失败")
+            }
+            loadingbut.value = false; 
+            loadingbuttext.value = '提交';
+      })
+      .catch ((error :any)=>{
+        ElMessage.eror("请求失败，请检查客户端和服务器的网络环境")
+      })
     } else {
-      console.log('error submit!', fields)
+        ElMessage.eror("校验数据失败，请检查输入的数据是否符合规范")
     }
   })
 }
