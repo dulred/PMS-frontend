@@ -97,18 +97,26 @@
   
   <script lang="ts" setup>
   import NavMain from '@/components/NavMain.vue';
-  import {ref} from "vue";
-  import type {FormInstance,FormRules} from "element-plus"
+  import {ref,inject,onMounted} from "vue";
+  import type {FormInstance, FormRules} from 'element-plus'
+  import {ElMessage,ElMessageBox} from "element-plus";
+
+  const axios:any = inject("$axios")
+  
   const loadingbut = ref(false);
   const loadingbuttext = "修改"
   const selectFormRef =ref<FormInstance> ()
-  const selectForm = ref({});
+  const selectForm = ref({
+    act:"",
+    currentPage:1,
+    pageSize:5,
+  });
   const tableData = ref([ {} ]);
   const dialogVisibleDetail = ref(false)
   const dialogVisible = ref(false)
 
   //页码变量
-  const pageSize = ref(3);
+  const pageSize = ref(5);
   const total = ref(5)
   const currentPage =ref(1)
 
@@ -129,49 +137,104 @@
       staffsource: [{ required: true, message: '请选择人员来源', trigger: 'change' }],
     })
 
-    const departments = ref([
-      { id:"1",dname:"战略规划部门" },
-      { id:"2",dname:"行政部门" },
-      { id:"3",dname:"技术部门" },
-      { id:"4",dname:"产品部门" },
-      { id:"5",dname:"市场部门" },
-      { id:"6",dname:"财务部门" },
-      { id:"7",dname:"商务部门" },
-      { id:"8",dname:"审计部门" },
-      { id:"9",dname:"研究院/实验室" },
-      { id:"10",dname:"法务部门" },
-      { id:"11",dname:"项目组" },
-    ])
+const departments = ref([{}])
 
-    const posts =  ref([
-      { id:"1",pname:"系统架构师" },
-      { id:"2",pname:"全栈工程师" },
-      { id:"3",pname:"后端工程师" },
-      { id:"4",pname:"前端工程师" },
-      { id:"5",pname:"测试工程师" },
-      { id:"6",pname:"运维工程师" },
-    ])
-
+const posts =  ref([{}])
 
 const status = ref(["正常","转正","延期","不录用"]);
 
+onMounted(()=>{
+  loadDepartment();
+  loadPost();
+  loadPeriods();
+})
+const loadPeriods = ()=>{
+    axios.post("/selectPeriodStaff",{
+      currentPage : currentPage.value,
+      pageSize:pageSize.value
+    })
+    .then(
+      (resp:any)=>{
+        tableData.value = resp.data.staffs;
+        total.value  = resp.data.total
+      }
+    )
+    .catch((error:any)=>{
+      console.log("首次加载数据失败")
+    })
+}
+const loadDepartment = ()=>{ 
+    axios.get("/getDepartment")
+    .then((resp:any)=>{
+        departments.value = resp.data;
+    })
+    .catch((error:any)=>{
+        console.log("首次加载Department数据失败")
+    })
+}
+
+const loadPost = ()=>{ 
+    axios.get("/getPost")
+    .then((resp:any)=>{
+        posts.value = resp.data;
+    })
+    .catch((error:any)=>{
+        console.log("首次加载Post数据失败")
+    })
+}
+
+
 
   // 页码
-  const handleCurrentChange = ()=>{
-    console.log("nishizhu")
+  const handleCurrentChange = (val:any)=>{
+    currentPage.value = val
+    if(selectForm.value.act=="byCon"){
+        selectForm.value.currentPage = currentPage.value;
+        selectForm.value.pageSize = pageSize.value;
+        selectPeriodByCon();
+    }else{
+      loadPeriods();
+    }
+  
   }
 
   //头部样式
   const headClass=()=> { 
     return { textAlign: 'center',backgroundColor:"rgb(242,242,242)",color:"rgb(140,138,140)", }
   };
-  const selectPeriodByCon = ()=>{ }
+  const selectPeriodByCon = ()=>{
+    console.log(selectForm.value)
+      axios.post("/selectPeriodStaffCon",selectForm.value)
+      .then((resp :any)=>{
+          ElMessage({
+            message:"查询成功",
+            type:"success"
+          })
+          tableData.value = resp.data.staffs;
+          total.value = resp.data.total;
+      })
+      .catch((error:any)=>{
+        ElMessage.error("查询失败")
+      })
+   }
   //表格编辑
-  const handleEdit = (index:any,row:any,act:any)=>{
-    if(act === 'update')
-        dialogVisibleDetail.value = true
-      else
-        dialogVisible.value = true
+  const handleEdit = (index:any,row:any,status:any)=>{
+    axios.get("/periodOp?id=" + row.id + "&& status ="+ status)
+    .then((resp:any)=>{
+      if(resp.data=="ok"){
+        ElMessage({
+          message:"修改成功",
+          type:"success"
+        })
+        loadPeriods();
+      }else{
+        ElMessage.error("修改失败")
+      }
+    })
+    .catch((error:any)=>{
+      ElMessage.error("请求错误")
+    })
+
   }
 
   

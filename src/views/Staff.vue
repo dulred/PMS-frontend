@@ -527,7 +527,7 @@ const add = async (formEl: FormInstance | undefined) => {
                 dialogVisibleDetail.value = false
             }
         })
-        .catch((error)=>{
+        .catch((error:any)=>{
             ElMessage.error("请求修改失败，请检查网络")
         })
 

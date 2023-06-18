@@ -21,7 +21,7 @@
       </el-select>
     </el-form-item>
     <el-form-item label="调动类型" prop="ttype">
-      <el-select v-model="addForm.ttype" placeholder="请选择岗位类型">
+      <el-select v-model="addForm.ttype" placeholder="请选择调动类型">
         <el-option v-for="(item,index) in ttypes" :key="index" :label="item" :value="item"></el-option>
       </el-select>
     </el-form-item>
@@ -38,13 +38,22 @@
 </template>
 
 <script lang="ts" setup>
-  import {ref} from "vue";
-  import NavMain from '@/components/NavMain.vue';
-  import type {FormInstance,FormRules} from "element-plus"
-  const loadingbut = ref(false);
-  const loadingbuttext = "提交"
+    import {ref,onMounted,inject} from "vue";
+    import NavMain from '@/components/NavMain.vue';
+    import type {FormInstance,FormRules} from "element-plus"
+    import { useRouter } from "vue-router";
+    import { ElMessage } from "element-plus";
+  const router = useRouter()
+  const axios:any = inject("$axios")
+  const loadingbut = ref(false);  
+  const loadingbuttext = ref("添加")
   const addFormRef =ref<FormInstance> ()
-  const addForm = ref({ })
+  const addForm = ref({ 
+    staff_id:"",
+    beforepost_id:"",
+    sname:"",
+    beforepost_name:""
+  })
 
   const rules = ref<FormRules>({
            staff_id: [{required: true, message: '请输入员工编号', trigger: 'blur'}],
@@ -55,20 +64,29 @@
 
   const ttypes = ref ([ "升职","降职","数据录入错误"] )
 
-  const posts =  ref([
-    { id:"1",pname:"系统架构师" },
-    { id:"2",pname:"全栈工程师" },
-    { id:"3",pname:"后端工程师" },
-    { id:"4",pname:"前端工程师" },
-    { id:"5",pname:"测试工程师" },
-    { id:"6",pname:"运维工程师" },
-  ])
+  const posts =  ref([ ])
 
+onMounted(()=>{
+  loadPost();
+})
+
+  const loadPost = ()=>{ 
+    axios.get("/getPost")
+    .then((resp:any)=>{
+        posts.value = resp.data;
+    })
+    .catch((error:any)=>{
+        console.log("首次加载Post数据失败")
+    })
+}
 
 const add = async (formEl: FormInstance | undefined) => {
 if (!formEl) return
 await formEl.validate((valid:any, fields:any) => {
   if (valid) {
+    loadingbut.value = true;
+    loadingbuttext.value = '添加中...';
+    
     console.log('submit!')
   } else {
     console.log('error submit!', fields)
@@ -76,13 +94,23 @@ await formEl.validate((valid:any, fields:any) => {
 })
 }
 
+
+
 const cancel = (formEl: FormInstance | undefined) => {
 if (!formEl) return
 formEl.resetFields()
 }
 
 const getBeforePost = ()=>{
-
+  axios.get("/getBeforePost?id=" + addForm.value.staff_id)
+  .then((resp:any)=>{
+    addForm.value.beforepost_id = resp.data.beforepost_id;
+    addForm.value.sname = resp.data.sname;
+    addForm.value.beforepost_name = resp.data.beforepost_name;
+  })
+  .catch((error:any)=>{
+    ElMessage.error("获取员工信息失败")
+  })
 }
 
   
