@@ -74,32 +74,81 @@
 
 <script lang="ts" setup>
 import NavMain from '@/components/NavMain.vue';
-import {ref} from "vue";
+import {ref,inject,onMounted} from "vue";
 import type {FormInstance,FormRules} from "element-plus"
+import  {ElMessage} from "element-plus"
+
+const axios:any = inject("$axios");
+
 
 const selectFormRef =ref<FormInstance> ()
-const selectForm = ref({});
-const tableData = ref([ {} ]);
-
-
 //页码变量
-const pageSize = ref(3);
+const pageSize = ref(5);
 const total = ref(5)
 const currentPage =ref(1)
 
+const selectForm = ref({
+  act:"",
+  currentPage:1,
+  pageSize:pageSize.value
+});
+const tableData = ref([ {} ]);
 
-  const ttypes = ref ([ "升职","降职","数据录入错误"] )
+
+
+
+const ttypes = ref ([ "升职","降职","数据录入错误"] )
+
+onMounted(()=>{
+  loadTransfer();
+})
+
+const loadTransfer = ()=>{
+    axios.post("/getTransferByPage",{
+      currentPage:currentPage.value,
+      pageSize:pageSize.value
+    })
+    .then((resp:any)=>{
+        tableData.value = resp.data.transfers;
+        total.value  = resp.data.total;
+    })
+    .catch((error:any)=>{
+      ElMessage.eror("首次加载数据错误")
+    })
+}
 
 // 页码
-const handleCurrentChange = ()=>{
-  console.log("nishizhu")
+const handleCurrentChange = (val:any)=>{
+  currentPage.value = val;
+  if(selectForm.value.act=="byCon"){
+    selectForm.value.currentPage = currentPage.value;
+    selectForm.value.pageSize = pageSize.value;
+    selectTransfersByCon();
+  }else{
+    loadTransfer();
+  }
+  
 }
 
 //头部样式
 const headClass=()=> { 
   return { textAlign: 'center',backgroundColor:"rgb(242,242,242)",color:"rgb(140,138,140)", }
 };
-const selectTransfersByCon = ()=>{ }
+const selectTransfersByCon = ()=>{ 
+    selectForm.value.act= "byCon"
+    axios.post("/selectTransfersByCon",selectForm.value)
+    .then((resp:any)=>{
+        tableData.value  = resp.data.transfers;
+        total.value = resp.data.total;
+        ElMessage({
+          message:"查询成功",
+          type:"success"
+        })
+    })
+    .catch((error:any)=>{
+        ElMessage.error("查询失败，请检查请求网络")
+    })
+}
 
 
 
@@ -111,6 +160,7 @@ margin-top: 30px;
 display: flex;justify-content: center;
 .el-form {margin: auto;}
 }
-.pagination {margin-top: 20px;}
+.pagination {margin-top: 20px;display: flex;
+    justify-content: center; align-items: center;}
 
 </style>

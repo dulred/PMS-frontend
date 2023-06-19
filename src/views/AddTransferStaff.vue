@@ -86,10 +86,24 @@ await formEl.validate((valid:any, fields:any) => {
   if (valid) {
     loadingbut.value = true;
     loadingbuttext.value = '添加中...';
-    
-    console.log('submit!')
+    axios.post("/addTransferStaff",addForm.value)
+    .then ((resp:any)=>{
+      if(resp.data=="ok")
+      {
+        ElMessage({
+          message:"添加成功",
+          type:"success"
+        })
+        router.replace({path:"/transferStaff"})
+      }else{
+        ElMessage.error("请检查数据是否正确合法")
+      }
+    })
+    .catch((error:any)=>{
+        ElMessage.error("添加失败，请检查网络")
+    })
   } else {
-    console.log('error submit!', fields)
+    ElMessage.error("数据验证失败，请检查数据格式和要求")
   }
 })
 }

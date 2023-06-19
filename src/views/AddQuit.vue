@@ -29,13 +29,20 @@
 </template>
 
 <script lang="ts" setup>
-  import {ref} from "vue";
-  import NavMain from '@/components/NavMain.vue';
-  import type {FormInstance,FormRules} from "element-plus"
-  const loadingbut = ref(false);
-  const loadingbuttext = "提交"
-  const addFormRef =ref<FormInstance> ()
-  const addForm = ref({ })
+    import {ref,onMounted,inject} from "vue";
+    import NavMain from '@/components/NavMain.vue';
+    import type {FormInstance,FormRules} from "element-plus"
+    import { useRouter } from "vue-router";
+    import { ElMessage } from "element-plus";
+    const axios:any = inject("$axios")
+    const router  = useRouter();
+    const loadingbut = ref(false);
+    const loadingbuttext = ref("提交") 
+    const addFormRef =ref<FormInstance> ()
+    const addForm = ref({
+      staff_id:"",
+      sname:""
+     })
 
   const rules = ref<FormRules>({
           staff_id: [{required: true, message: '请输入员工编号', trigger: 'blur'}],
@@ -50,9 +57,26 @@ const add = async (formEl: FormInstance | undefined) => {
 if (!formEl) return
 await formEl.validate((valid:any, fields:any) => {
   if (valid) {
-    console.log('submit!')
+    loadingbut.value = true;
+    loadingbuttext.value = '添加中...';
+    axios.post("/addQuit",addForm.value)
+    .then ((resp:any)=>{
+      if(resp.data=="ok")
+      {
+        ElMessage({
+          message:"添加成功",
+          type:"success"
+        })
+        router.replace({path:"/quit"})
+      }else{
+        ElMessage.error("请检查数据是否正确合法")
+      }
+    })
+    .catch((error:any)=>{
+        ElMessage.error("添加失败，请检查网络")
+    })
   } else {
-    console.log('error submit!', fields)
+    ElMessage.error("数据验证失败，请检查数据格式和要求")
   }
 })
 }
@@ -61,10 +85,16 @@ const cancel = (formEl: FormInstance | undefined) => {
 if (!formEl) return
 formEl.resetFields()
 }
-
 const getBeforePost = ()=>{
-
+  axios.get("/getBeforePost?id=" + addForm.value.staff_id)
+  .then((resp:any)=>{
+    addForm.value.sname = resp.data.sname;
+  })
+  .catch((error:any)=>{
+    ElMessage.error("获取员工信息失败")
+  })
 }
+
 
   
 

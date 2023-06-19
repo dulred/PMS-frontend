@@ -72,18 +72,28 @@
 
 <script lang="ts" setup>
 import NavMain from '@/components/NavMain.vue';
-import {ref} from "vue";
+import {ref,inject,onMounted} from "vue";
 import type {FormInstance,FormRules} from "element-plus"
+import  {ElMessage} from "element-plus"
 
+
+const axios:any = inject("$axios");
 const selectFormRef =ref<FormInstance> ()
-const selectForm = ref({});
-const tableData = ref([ {} ]);
-
 
 //页码变量
 const pageSize = ref(3);
 const total = ref(5)
 const currentPage =ref(1)
+
+const selectForm = ref({
+  currentPage:1,
+  pageSize:pageSize.value,
+  act:""
+});
+const tableData = ref([ {} ]);
+
+
+
 
 const qtypes = ref ( ["辞职","辞退","退休","开除","不录用"] )
 
@@ -108,6 +118,7 @@ margin-top: 30px;
 display: flex;justify-content: center;
 .el-form {margin: auto;}
 }
-.pagination {margin-top: 20px;}
+.pagination {margin-top: 20px;display: flex;
+    justify-content: center; align-items: center;}
 
 </style>

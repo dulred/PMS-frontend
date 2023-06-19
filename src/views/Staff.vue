@@ -544,7 +544,7 @@ const cancel = (formEl: FormInstance | undefined) => {
 
 
   // 页码
-  const handleCurrentChange = (val)=>{
+  const handleCurrentChange = (val:any)=>{
     currentPage.value = val
     if(selectForm.value.act=="byCon"){
         selectForm.value.currentPage = currentPage.value;
@@ -563,7 +563,7 @@ const cancel = (formEl: FormInstance | undefined) => {
         selectForm.value.act="byCon";
    
         axios.post("/selectStaffByCon",selectForm.value)
-        .then((resp)=>{
+        .then((resp:any)=>{
             console.log(resp)
             tableData.value = resp.data.staffs;
             total.value = resp.data.total;
@@ -572,17 +572,17 @@ const cancel = (formEl: FormInstance | undefined) => {
                 type:"success"
             })
         })
-        .catch((error)=>{
+        .catch((error:any)=>{
             ElMessage.error("查询失败")
         })
    }
   //表格编辑
   const handleEdit = (index:any,row:any,act:any)=>{
     axios.get("/getStaffDetail?id=" + row.id)
-    .then((resp)=>{
+    .then((resp:any)=>{
         addForm.value = resp.data;
     })
-    .catch((error)=>{
+    .catch((error :any)=>{
         ElMessage.error("查询数据失败")
     })
     if(act === 'update')
