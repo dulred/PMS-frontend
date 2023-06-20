@@ -420,7 +420,7 @@
   import NavMain from '@/components/NavMain.vue';
   import {ref,onMounted,inject} from "vue";
   import type {FormInstance,FormRules} from "element-plus"
-  import {ElMessage} from "element-plus"
+  import {ElMessage,ElMessageBox } from "element-plus"
 
   const axios:any = inject("$axios");
 
@@ -592,7 +592,43 @@ const cancel = (formEl: FormInstance | undefined) => {
   }
   //表格删除
   const handleDelete = (index:any,row:any)=>{
-    console.log("nishizhu")
+  
+    ElMessageBox.confirm(
+    'proxy will permanently delete the file. Continue?',
+    'Warning',
+    {
+      confirmButtonText: 'OK',
+      cancelButtonText: 'Cancel',
+      type: 'warning',
+    }
+  )
+    .then(() => {
+      axios.post("/deleteStaff?id=" + row.id)
+      .then(
+        (resp :any)=>{
+          if(resp.data=="ok"){
+            ElMessage({
+            type: 'success',
+            message: 'Delete completed',
+          })
+          loadStaff();
+          }else{
+            ElMessage.error('不能删除有关联数据')
+          }
+  
+        }
+      )
+      .catch((failResponse :any) => {
+          ElMessage.error('删除失败,可能传入数据有误')
+        })
+     
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: 'Delete canceled',
+      })
+    })
   }
 
   </script>

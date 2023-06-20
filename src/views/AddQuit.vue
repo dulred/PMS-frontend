@@ -85,9 +85,11 @@ const cancel = (formEl: FormInstance | undefined) => {
 if (!formEl) return
 formEl.resetFields()
 }
+
 const getBeforePost = ()=>{
   axios.get("/getBeforePost?id=" + addForm.value.staff_id)
   .then((resp:any)=>{
+    console.log(resp)
     addForm.value.sname = resp.data.sname;
   })
   .catch((error:any)=>{

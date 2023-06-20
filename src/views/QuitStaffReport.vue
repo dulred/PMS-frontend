@@ -55,12 +55,13 @@
 
 <script lang="ts" setup>
 import NavMain from '@/components/NavMain.vue';
-import {ref} from "vue";
+import {ref,inject,onMounted} from "vue";
 import type {FormInstance,FormRules} from "element-plus"
+import  {ElMessage} from "element-plus"
 
-const selectFormRef =ref<FormInstance> ()
-const selectForm = ref({});
-const tableData = ref([ {} ]);
+const axios:any = inject ("$axios");
+
+
 
 
 //页码变量
@@ -68,17 +69,63 @@ const pageSize = ref(3);
 const total = ref(5)
 const currentPage =ref(1)
 
+const selectFormRef =ref<FormInstance> ()
+const selectForm = ref({
+  currentPage:1,
+  pageSize:pageSize.value,
+  act:""
+});
+const tableData = ref([ {} ]);
+
+onMounted(()=>{
+  loadQuitStaffReport();
+})
+const loadQuitStaffReport =()=>{
+    axios
+          .post('/getQuitStaffReport',{
+            currentPage: currentPage.value,
+            pageSize:pageSize.value
+          })
+          .then((successResponse:any) => {
+              tableData.value = successResponse.data.newQuitReports
+              total.value = successResponse.data.total
+          })
+          .catch((failResponse:any) => {
+            ElMessage.error("首次请求失败")
+          })
+}
+
+
 // 页码
-const handleCurrentChange = ()=>{
-  console.log("nishizhu")
+const handleCurrentChange = (val:any)=>{
+  currentPage.value = val;
+    if(selectForm.value.act=="byCon"){
+
+      selectForm.value.currentPage = currentPage.value;
+      selectForm.value.pageSize = pageSize.value;
+      selectQuitStaffReportByCon();
+
+    }else{
+      loadQuitStaffReport();
+    }
 }
 
 //头部样式
 const headClass=()=> { 
   return { textAlign: 'center',backgroundColor:"rgb(242,242,242)",color:"rgb(140,138,140)", }
 };
-const selectQuitStaffReportByCon = ()=>{ }
+const selectQuitStaffReportByCon = ()=>{ 
 
+  selectForm.value.act="byCon"
+    axios.post("/selectQuitStaffReportByCon",selectForm.value)
+    .then((resp:any)=>{
+      tableData.value = resp.data.newQuitReports
+      total.value = resp.data.total
+    })
+    .catch((error:any)=>{
+        ElMessage.error("查询失败")
+    })
+}
 
 
 </script>
@@ -89,6 +136,7 @@ margin-top: 30px;
 display: flex;justify-content: center;
 .el-form {margin: auto;}
 }
-.pagination {margin-top: 20px;}
+.pagination {margin-top: 20px;display: flex;
+    justify-content: center; align-items: center;}
 
 </style>

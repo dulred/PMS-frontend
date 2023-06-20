@@ -18,7 +18,7 @@
   <el-row>
     <el-col :span="12">
         <el-form-item label="离职类型"  prop="qtype">
-            <el-select v-model="selectForm.ttype" placeholder="请选择离职类型">
+            <el-select v-model="selectForm.qtype" placeholder="请选择离职类型">
                 <el-option v-for="(item,index) in qtypes" :key="index" :label="item" :value="item"></el-option>
             </el-select>
         </el-form-item>
@@ -92,21 +92,56 @@ const selectForm = ref({
 });
 const tableData = ref([ {} ]);
 
-
-
-
 const qtypes = ref ( ["辞职","辞退","退休","开除","不录用"] )
 
+onMounted (()=>{
+  loadQuit();
+})
+
+const loadQuit = () => {
+      axios
+          .get('/getQuit?currentPage=' + currentPage.value + '&&pageSize=' + pageSize.value)
+          .then((successResponse:any) => {
+              tableData.value = successResponse.data.quits
+              total.value = successResponse.data.total
+          })
+          .catch((failResponse:any) => {
+            ElMessage.error("首次加载数据失败")
+          })
+}
+
 // 页码
-const handleCurrentChange = ()=>{
-  console.log("nishizhu")
+const handleCurrentChange = (val:any)=>{
+    currentPage.value = val;
+    if(selectForm.value.act=="byCon"){
+
+      selectForm.value.currentPage = currentPage.value;
+      selectForm.value.pageSize = pageSize.value;
+      selectQuitsByCon();
+
+    }else{
+      loadQuit();
+    }
+    
 }
 
 //头部样式
 const headClass=()=> { 
   return { textAlign: 'center',backgroundColor:"rgb(242,242,242)",color:"rgb(140,138,140)", }
 };
-const selectQuitsByCon = ()=>{ }
+const selectQuitsByCon = ()=>{
+
+    selectForm.value.act="byCon"
+    axios.post("/selectQuitsByCon",selectForm.value)
+    .then((resp:any)=>{
+      tableData.value = resp.data.quits
+      total.value = resp.data.total
+    })
+    .catch((error:any)=>{
+        ElMessage.error("查询失败")
+    })
+
+ }
 
 
 
