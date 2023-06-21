@@ -88,7 +88,7 @@ const loadTransferStaffReport =()=>{
             pageSize:pageSize.value
           })
           .then((successResponse:any) => {
-              tableData.value = successResponse.data.newStaffReports
+              tableData.value = successResponse.data.newTransferReports
               total.value = successResponse.data.total
           })
           .catch((failResponse:any) => {
@@ -120,7 +120,7 @@ const selectTransferStaffReportByCon = ()=>{
   selectForm.value.act="byCon"
     axios.post("/selectTransferStaffReportByCon",selectForm.value)
     .then((resp:any)=>{
-      tableData.value = resp.data.quits
+      tableData.value = resp.data.newTransferReports
       total.value = resp.data.total
     })
     .catch((error:any)=>{

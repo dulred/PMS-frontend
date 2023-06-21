@@ -81,7 +81,7 @@ onMounted(()=>{
 })
 const loadNewStaffReport =()=>{
     axios
-          .post('/getNewStaffReport?currentPage',{
+          .post('/getNewStaffReport',{
             currentPage:currentPage.value,
             pageSize:pageSize.value
           })
@@ -117,9 +117,9 @@ const headClass=()=> {
 const selectNewStaffReportByCon = ()=>{ 
 
   selectForm.value.act="byCon"
-    axios.post("/selectQuitsByCon",selectForm.value)
+    axios.post("/selectNewStaffReportByCon",selectForm.value)
     .then((resp:any)=>{
-      tableData.value = resp.data.quits
+      tableData.value = resp.data.newStaffReports
       total.value = resp.data.total
     })
     .catch((error:any)=>{

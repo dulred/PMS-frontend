@@ -1,5 +1,4 @@
 import { createRouter ,createWebHistory } from "vue-router";
-import Test from "@/components/Test.vue";
 
 const routes = [
 
@@ -98,12 +97,7 @@ const routes = [
         component: ()=>import("@/views/TransferStaffReport.vue"),
         meta: { requiresAuth: true }
     },
-    {
-        name:"Test",
-        path: '/test',
-        component:Test,
-        meta: { requiresAuth: true }
-    },
+
 
 ]
 

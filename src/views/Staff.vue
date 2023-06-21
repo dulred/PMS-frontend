@@ -427,7 +427,7 @@
   const loadingbut = ref(false);
   const loadingbuttext = "修改"
   const selectFormRef =ref<FormInstance> ()
-  const selectForm = ref({});
+
   const tableData = ref([ {} ]);
   const dialogVisibleDetail = ref(false)
   const dialogVisible = ref(false)
@@ -437,6 +437,11 @@
   const total = ref(5)
   const currentPage =ref(1)
 
+  const selectForm = ref({
+    act:"",
+    currentPage:1,
+    pageSize:pageSize.value,
+  });
 
   const addFormRef =ref<FormInstance> ()
     const addForm = ref({ })
@@ -545,7 +550,7 @@ const cancel = (formEl: FormInstance | undefined) => {
 
   // 页码
   const handleCurrentChange = (val:any)=>{
-    currentPage.value = val
+    currentPage.value = val 
     if(selectForm.value.act=="byCon"){
         selectForm.value.currentPage = currentPage.value;
         selectForm.value.pageSize = pageSize.value;
